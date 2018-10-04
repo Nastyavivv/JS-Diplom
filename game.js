@@ -360,52 +360,6 @@ function loadSchemas() {
 				"xxxxxxxxx!!!!!!!xxxxxxx",
 				"                       "
 			],
-			[
-				"                       ",
-				"                       ",
-				"                       ",
-				"    o                  ",
-				"    x      | x!!x=     ",
-				"         x             ",
-				"                      x",
-				"                       ",
-				"                       ",
-				"                       ",
-				"               xx      ",
-				"                       ",
-				"                       ",
-				"       xxx  |          ",
-				"                       ",
-				" @                     ",
-				"xxx                    ",
-				"                       "
-			],
-			[
-				"   v         v",
-				"              ",
-				"         !o!  ",
-				"              ",
-				"              ",
-				"              ",
-				"              ",
-				"         xxx  ",
-				"          o   ",
-				"        =     ",
-				"  @           ",
-				"  xxxx        ",
-				"  |           ",
-				"      xxx    x",
-				"              ",
-				"          !   ",
-				"              ",
-				"              ",
-				" o       x    ",
-				" x      x     ",
-				"              ",
-				"      x       ",
-				"   xx         ",
-				"              "
-			]
 		];
 		resolve(JSON.stringify(schemasArray));
 	});
