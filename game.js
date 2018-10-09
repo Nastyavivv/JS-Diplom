@@ -62,6 +62,7 @@ class Actor {
 			return false;
 		}
 
+		// все скобки можно опустить
 		return (
 			((this.right > nextActor.left) && (this.left < nextActor.right)) &&
 			((this.bottom > nextActor.top) && (this.top < nextActor.bottom))
@@ -74,10 +75,12 @@ class Level {
 	constructor(grid = [], actors = []) {
 		this.grid = grid;
 		this.actors = actors;
+		// тут можно исользовать стрелочную функцию
 		this.player = this.actors.find(function (actor) {
 			return actor.type === 'player';
 		});
 		this.height = grid.length;
+    // тут можно исользовать стрелочную функцию
 		this.width = grid.reduce(function (memo, el) {
 			if (el.length > memo) {
 				memo = el.length;
@@ -89,22 +92,28 @@ class Level {
 		this.finishDelay = 1;
 	}
 	isFinished() {
+		// скобки можно опустить
 		return (this.status !== null && this.finishDelay < 0);
 	}
 
 	actorAt(actor) {
+		// это лишняя проверка, ниже проверяется тип,
+		// а undefined instanceof Actor === false
 		if (actor === undefined) {
 			throw Error('Нужно указать объект типа Actor');
 		}
 		if (!(actor instanceof Actor)) {
 			throw Error('Нужно указать объект типа Actor');
 		}
+
+		// стрелочная функция
 		return this.actors.find(function (el) {
 			return actor.isIntersect(el);
 		});
 	}
 
 	obstacleAt(toPos, size) {
+		// некорректное условие
 		if (!toPos instanceof Vector || !size instanceof Vector) {
 			throw Error('Нужно указать объект типа Vector');
 		}
@@ -117,13 +126,20 @@ class Level {
 			return 'lava';
 		}
 
+		// оригинальный алгоритм, но лучше проверить только те клетки,
+		// на которых расположен объект
 		for (let yIndex = 0; yIndex < this.grid.length; ++yIndex) {
 			for (let xIndex = 0; xIndex < this.grid[yIndex].length; ++xIndex) {
 
+				// если значение присваеивается переменной 1 раз,
+				// то лучше использовать const
 				let obstacleType = this.grid[yIndex][xIndex];
 				let obstacleActor = new Actor(new Vector(xIndex, yIndex));
 				let player = new Actor(toPos, size);
 				let result = player.isIntersect(obstacleActor);
+				// достаточно проверить, что obstacleType е пустое,
+				// иначе при добавлении новых препятствий придётся править
+				// код в нескольких местах
 				if (result && (obstacleType === 'wall' || obstacleType === 'lava')) {
 					return obstacleType;
 				}
@@ -132,6 +148,9 @@ class Level {
 	}
 
 	removeActor(actor) {
+		// const
+		// нужно искать оменно переданных объект,
+		// а не объект с такой же позицией и размером
 		let index = this.actors.findIndex(function (el) {
 			return (el.pos === actor.pos && el.size === actor.size);
 		});
@@ -139,12 +158,15 @@ class Level {
 	}
 
 	noMoreActors(actorsType) {
+		// стрелочная функция
 		return !this.actors.some(function (el) {
 			return el.type === actorsType;
 		});
 	}
 
 	playerTouched(objType, actor) {
+		// так не нужно писатьб
+		// можно просто написать в if return и уобрать else
 		if (this.status !== null) {} else {
 
 			if (objType === 'lava' || objType === 'fireball') {
@@ -173,6 +195,7 @@ class LevelParser {
 		switch (symbSrting) {
 			case 'x':
 				return 'wall';
+				// после return break не нужен
 				break;
 			case '!':
 				return 'lava';
@@ -180,12 +203,15 @@ class LevelParser {
 	}
 
 	createGrid(schema) {
+		// const
 		let memo = [];
+		// здесь можно использовать метод map 2 раза
 		schema.forEach((schemaEl) => memo.push(schemaEl.split('').map(el => this.obstacleFromSymbol(el))));
 		return memo;
 	}
 
 	createActors(schema) {
+		// зачем переменные indexX и indexY?
 		let indexY;
 		let indexX;
 		let actors = [];
@@ -196,14 +222,21 @@ class LevelParser {
 			for (let x = 0; x < symbolsArray.length; ++x) {
 				indexX = x;
 				let symbSrting = symbolsArray[x];
+				// лишняя переменная
 				let prot = Actor.prototype;
+				// const
 				let actorConstructor = this.actorFromSymbol(symbSrting);
 
+				// const
 				let actorVector = new Vector(indexX, indexY);
+				// тут достаточно проверить что actorConstructor
+				// это функция, создать объект и проверить,
+				// что он является экземпляром Actor или наследника
 				if (
 					((typeof actorConstructor) === 'function') &&
 					((actorConstructor === Actor) || (Actor.prototype.isPrototypeOf(actorConstructor.prototype)))
 				) {
+					// const, скобки вокруг actorConstructor
 					let resultActor = new(actorConstructor)(actorVector);
 					actors.push(resultActor);
 				}
@@ -213,6 +246,7 @@ class LevelParser {
 	}
 
 	parse(schema) {
+		// const
 		let grid = this.createGrid(schema);
 		let actors = this.createActors(schema);
 		return (new Level(grid, actors));
@@ -223,6 +257,7 @@ class LevelParser {
 class Player extends Actor {
 	constructor(coords) {
 		super(coords, new Vector(1, 1), new Vector(0, 0));
+		// pos должно задаваться через вызов родительского конструктора
 		this.pos = this.pos.plus(new Vector(0, -0.5));
 	}
 
@@ -242,6 +277,7 @@ class Fireball extends Actor {
 	}
 
 	getNextPosition(time = 1) {
+		// тут нужно использовать методы класса Vector
 		let nextVector = new Vector(this.pos.x, this.pos.y);
 		nextVector.x += (this.speed.x * time);
 		nextVector.y += (this.speed.y * time);
@@ -249,13 +285,16 @@ class Fireball extends Actor {
 	}
 
 	handleObstacle() {
+		// тут нужно использовать етод класса Vector
 		this.speed.x = this.speed.x * -1;
 		this.speed.y = this.speed.y * -1;
 	}
 
 	act(time, level) {
+		// const
 		let nextPos = this.getNextPosition(time);
 		let obstacleThere = level.obstacleAt(nextPos, this.size);
+		// зачем проверять что за препятситвие?
 		if (obstacleThere === 'wall' || obstacleThere === 'lava') {
 			this.handleObstacle();
 		} else {
@@ -371,11 +410,12 @@ const actorDict = {
 	'v': FireRain,
 	'=': HorizontalFireball,
 	'|': VerticalFireball
-}
+} // точка с запятой :)
 const parser = new LevelParser(actorDict);
 
 loadSchemas()
 	.then(JSONString => JSON.parse(JSONString))
 	.then(schemas => runGame(schemas, parser, DOMDisplay))
 	.then(() => alert('Вы выиграли приз!'))
+// 'use strict'?
 	.catch(err => console.log(err));'use strict';
